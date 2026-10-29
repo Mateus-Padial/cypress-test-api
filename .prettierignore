@@ -1,0 +1,7 @@
+node_modules/
+.claude/
+cypress.env.json
+cypress/reports/
+cypress/screenshots/
+cypress/videos/
+cypress/downloads/

@@ -1,0 +1,94 @@
+trigger:
+  branches:
+    include:
+      - main
+      - master
+
+pr:
+  branches:
+    include:
+      - main
+      - master
+
+schedules:
+  - cron: "0 12 * * *"
+    displayName: "Execucao diaria (09:00 horario de Brasilia)"
+    branches:
+      include:
+        - main
+        - master
+    always: true
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  nodeVersion: "20.x"
+  CYPRESS_BASE_URL: ""
+  CYPRESS_CACHE_FOLDER: "$(Pipeline.Workspace)/.cache/Cypress"
+
+steps:
+  - task: NodeTool@0
+    displayName: "Instalar Node.js"
+    inputs:
+      versionSpec: "$(nodeVersion)"
+
+  - task: Cache@2
+    displayName: "Cache npm + Cypress"
+    inputs:
+      key: 'npm | "$(Agent.OS)" | package-lock.json'
+      restoreKeys: |
+        npm | "$(Agent.OS)"
+      path: "$(CYPRESS_CACHE_FOLDER)"
+
+  - script: npm ci
+    displayName: "Instalar dependencias (npm ci)"
+
+  - script: npm run lint && npm run format:check
+    displayName: "Lint + format check (ESLint/Prettier)"
+
+  - script: npx cypress verify
+    displayName: "Verificar instalacao do Cypress"
+
+  - script: node scripts/verificar-segredos.js
+    displayName: "Verificar segredos obrigatorios"
+    env:
+      CYPRESS_authToken: $(CYPRESS_authToken)
+      CYPRESS_servicoFinanceiroToken: $(CYPRESS_servicoFinanceiroToken)
+      CYPRESS_tokenClientId: $(CYPRESS_tokenClientId)
+      CYPRESS_tokenClientSecret: $(CYPRESS_tokenClientSecret)
+
+  - script: npx cypress run
+    displayName: "Rodar testes (cypress run)"
+    env:
+      CYPRESS_authToken: $(CYPRESS_authToken)
+      CYPRESS_servicoFinanceiroToken: $(CYPRESS_servicoFinanceiroToken)
+      CYPRESS_tokenClientId: $(CYPRESS_tokenClientId)
+      CYPRESS_tokenClientSecret: $(CYPRESS_tokenClientSecret)
+      CYPRESS_cnaeTokenClientId: $(CYPRESS_cnaeTokenClientId)
+      CYPRESS_cnaeTokenClientSecret: $(CYPRESS_cnaeTokenClientSecret)
+      CYPRESS_validationTokenClientId: $(CYPRESS_validationTokenClientId)
+      CYPRESS_validationTokenClientSecret: $(CYPRESS_validationTokenClientSecret)
+      CYPRESS_requesterId: $(CYPRESS_requesterId)
+      CYPRESS_clientId: $(CYPRESS_clientId)
+      CYPRESS_campaignId: $(CYPRESS_campaignId)
+      CYPRESS_catalogId: $(CYPRESS_catalogId)
+      CYPRESS_originId: $(CYPRESS_originId)
+      CYPRESS_codTotvs: $(CYPRESS_codTotvs)
+      CYPRESS_walletTokenClientId: $(CYPRESS_walletTokenClientId)
+      CYPRESS_walletTokenClientSecret: $(CYPRESS_walletTokenClientSecret)
+      CYPRESS_walletSubscriptionKey: $(CYPRESS_walletSubscriptionKey)
+
+  - script: |
+      node scripts/gerar-relatorio.js
+      node scripts/exportar-checklist.js
+    displayName: "Gerar relatorio HTML e checklist"
+    condition: always()
+
+  - task: PublishPipelineArtifact@1
+    displayName: "Publicar evidencias (cypress/reports)"
+    condition: always()
+    inputs:
+      targetPath: "cypress/reports"
+      artifact: "cypress-reports"
+      publishLocation: "pipeline"

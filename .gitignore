@@ -1,0 +1,17 @@
+node_modules/
+
+cypress.env.json
+
+azure-devops-variables.env
+
+.env
+!.env.ci
+!.env.example
+
+cypress/reports/
+cypress/screenshots/
+cypress/videos/
+cypress/downloads/
+
+*.log
+npm-debug.log*

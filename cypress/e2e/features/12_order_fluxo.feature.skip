@@ -1,0 +1,39 @@
+# language: pt
+@order @fluxo
+Funcionalidade: Order API - Fluxo de vida de um lote (criar -> aprovar)
+  Como consumidor do servico de ordens
+  Quero criar um lote e conduzi-lo ate a aprovacao
+  Para garantir o ciclo de vida ponta a ponta do agregado Batch
+
+  Contexto:
+    Dado que possuo um token de autenticacao valido para a Order API
+
+  @requer-massa
+  Cenario: Ciclo de vida do lote - criar, aguardar processamento, aprovar e conferir status
+    Quando crio um lote na Order API e guardo o identificador
+    Entao o lote deve ser criado e retornar um identificador
+    Quando consulto o lote criado na Order API
+    E aguardo o lote da Order API ficar pronto para acao
+    Quando aprovo o lote criado na Order API
+    Entao a aprovacao do lote deve ser aceita
+    Quando consulto o lote criado na Order API
+    Entao o lote criado deve constar como "Aprovado"
+
+  @requer-massa
+  Cenario: Ciclo de vida do grupo - criar, aprovar (negocio e fatura) e confirmar pagamento
+    Quando crio um grupo de lotes na Order API com nome unico e guardo o nome
+    Entao a criacao do grupo deve indicar sucesso
+    Quando consulto o grupo criado na Order API e guardo o identificador
+    Entao o identificador do grupo deve ser capturado
+    Quando aprovo o grupo criado no nivel negocio na Order API
+    Entao a acao no grupo deve ser aceita
+    Quando consulto os detalhes do grupo criado na Order API
+    Entao o grupo criado deve constar como "PendingBilling"
+    Quando aprovo o grupo criado no nivel fatura na Order API
+    Entao a acao no grupo deve ser aceita
+    Quando consulto os detalhes do grupo criado na Order API
+    Entao o grupo criado deve constar como "PendingCreditTransaction"
+    Quando confirmo o pagamento do grupo criado na Order API
+    Entao a acao no grupo deve ser aceita
+    Quando consulto os detalhes do grupo criado na Order API
+    Entao o grupo criado deve estar em processamento ou finalizado

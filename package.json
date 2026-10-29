@@ -1,0 +1,77 @@
+{
+  "name": "sf-credits-points-admin-api-tests",
+  "version": "1.0.0",
+  "description": "Testes de API (Cypress + Cucumber/Gherkin)",
+  "private": true,
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "open": "cypress open",
+    "pretest": "rimraf cypress/reports",
+    "test": "cypress run",
+    "posttest": "node scripts/gerar-relatorio.js && node scripts/exportar-checklist.js",
+    "test:simples": "cypress run --spec \"cypress/e2e/features/01_simples.feature\"",
+    "test:com-id": "cypress run --spec \"cypress/e2e/features/02_com_id.feature\"",
+    "test:completo": "cypress run --spec \"cypress/e2e/features/03_completo.feature\"",
+    "test:smoke": "cypress run --spec \"cypress/e2e/features/00_smoke.feature\"",
+    "test:regra": "cypress run --env tags='not @achado-qa'",
+    "test:achados": "cypress run --env tags=@achado-qa",
+    "test:credit-lot": "cypress run --spec \"cypress/e2e/features/05_credit_lot.feature\"",
+    "test:cnae": "cypress run --spec \"cypress/e2e/features/06_cnae.feature\"",
+    "test:cnae-contrato": "cypress run --spec \"cypress/e2e/features/06_cnae.feature\" --env tags='not @requer-massa'",
+    "test:audit": "cypress run --spec \"cypress/e2e/features/07_audit.feature\"",
+    "test:billpayment": "cypress run --spec \"cypress/e2e/features/08_billpayment.feature\"",
+    "test:pixout": "cypress run --spec \"cypress/e2e/features/09_pixout.feature\"",
+    "test:order": "cypress run --env tags='@order and not @fluxo'",
+    "test:order-contrato": "cypress run --env tags='@order and not @requer-massa and not @fluxo'",
+    "test:order-batch": "cypress run --spec \"cypress/e2e/features/10_order_batch.feature\"",
+    "test:order-recursos": "cypress run --spec \"cypress/e2e/features/11_order_recursos.feature\"",
+    "test:order-fluxo": "echo \"12_order_fluxo.feature esta em SKIP (renomeado p/ .feature.skip) - ver README secao 'Fluxos de vida'\" && exit 1",
+    "test:order-resend": "cypress run --spec \"cypress/e2e/features/18_order_resend_reprocessamento.feature\" --config excludeSpecPattern=[]",
+    "test:wallet": "cypress run --spec \"cypress/e2e/features/13_wallet_balance.feature\"",
+    "test:wallet-credit": "cypress run --spec \"cypress/e2e/features/14_wallet_credit.feature\"",
+    "test:wallet-authorization": "cypress run --spec \"cypress/e2e/features/15_wallet_authorization.feature\"",
+    "test:wallet-statement": "cypress run --spec \"cypress/e2e/features/16_wallet_statement.feature\"",
+    "test:wallet-tenant": "cypress run --spec \"cypress/e2e/features/17_wallet_tenant_credit.feature\"",
+    "test:wallet-full": "cypress run --env tags='@wallet'",
+    "relatorio": "node scripts/gerar-relatorio.js",
+    "relatorio:abrir": "node scripts/abrir.js html",
+    "checklist": "node scripts/exportar-checklist.js",
+    "checklist:abrir": "node scripts/abrir.js checklist",
+    "evidencias": "node scripts/abrir.js pasta",
+    "limpar": "rimraf cypress/reports",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "devDependencies": {
+    "@badeball/cypress-cucumber-preprocessor": "26.0.0",
+    "@bahmutov/cypress-esbuild-preprocessor": "2.2.8",
+    "@eslint/js": "10.0.1",
+    "cypress": "15.19.0",
+    "dotenv": "17.4.2",
+    "esbuild": "0.28.1",
+    "eslint": "10.8.1",
+    "eslint-config-prettier": "10.1.8",
+    "eslint-plugin-cypress": "7.0.0",
+    "globals": "17.11.0",
+    "multiple-cucumber-html-reporter": "3.10.0",
+    "prettier": "3.9.6",
+    "rimraf": "6.1.3",
+    "sharp": "0.35.5"
+  },
+  "cypress-cucumber-preprocessor": {
+    "stepDefinitions": [
+      "cypress/e2e/step_definitions/**/*.{js,ts}"
+    ],
+    "attachments": {
+      "enabled": true
+    },
+    "json": {
+      "enabled": true,
+      "output": "cypress/reports/cucumber-report.json"
+    }
+  }
+}
